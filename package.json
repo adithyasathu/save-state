@@ -1,0 +1,88 @@
+{
+  "name": "save-state",
+  "version": "1.0.0-alpha-0",
+  "description": "Abstraction for data store with In-Memory cache, MongoDB, Redis and Elastic without worrying about the internal implementations",
+  "main": "lib/index.js",
+  "types": "lib",
+  "scripts": {
+    "build": "tsc",
+    "test": "npm build && jest --coverage --env=node",
+    "coveralls": "npm build && jest --coverage && coveralls < coverage/lcov.info"
+  },
+  "author": "Adithya Sathu <adithya.sathu@gmail.com>",
+  "license": "MIT",
+  "files": [
+    "lib"
+  ],
+  "keywords": [
+    "data",
+    "store",
+    "memory",
+    "mongodb",
+    "redis",
+    "elastic",
+    "in memory",
+    "query",
+    "datastore",
+    "key",
+    "value",
+    "database",
+    "DB",
+    "data-engine",
+    "key-value",
+    "save",
+    "persist",
+    "app-state",
+    "state"
+  ],
+  "devDependencies": {
+    "@types/debug": "^4.1.5",
+    "@types/elasticsearch": "^5.0.24",
+    "@types/events": "^3.0.0",
+    "@types/jest": "^24.0.12",
+    "@types/mongodb": "3.0.4",
+    "@types/node": "^8.0.58",
+    "@types/redis": "2.8.0",
+    "coveralls": "^3.0.11",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.16.0",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "config": "^3.3.1",
+    "simple-node-logger": "^18.12.24",
+    "elasticsearch": "^16.7.1",
+    "events": "^3.1.0",
+    "heap-profile": "^0.4.0",
+    "mongodb": "^3.5.5",
+    "node-memwatch": "^1.0.1",
+    "redis": "^3.0.2"
+  },
+  "jest": {
+    "coverageThreshold": {
+      "global": {
+        "branches": 95,
+        "functions": 95,
+        "lines": 95,
+        "statements": 95
+      }
+    },
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/build/",
+      "/coverage/"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "sx",
+      "js",
+      "jsx",
+      "json"
+    ]
+  }
+}

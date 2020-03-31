@@ -1,0 +1,17 @@
+{
+    "extends": "tslint:recommended",
+    "rules": {
+        "curly": true,
+        "variable-name": true,
+        "indent": [true, "spaces"],
+        "semicolon": [true, "always"],
+        "no-unused-variable": [true, {"ignore-pattern": "^_"}],
+        "no-use-before-declare": true,
+        "no-var-keyword": true,
+        "switch-default": true,
+        "ordered-imports": [false],
+        "mocha-avoid-only": true,
+        "mocha-avoid-skip": true,
+        "object-literal-sort-keys": false
+    }
+}

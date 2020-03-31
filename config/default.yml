@@ -1,0 +1,7 @@
+settings:
+  redis:
+    url: redis://localhost:6379
+  mongo:
+    url: mongodb://localhost:27017
+  elastic:
+    url: http://localhost:9001
