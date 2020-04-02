@@ -12,6 +12,7 @@
         "ordered-imports": [false],
         "mocha-avoid-only": true,
         "mocha-avoid-skip": true,
-        "object-literal-sort-keys": false
+        "object-literal-sort-keys": false,
+        "strictPropertyInitialization": false
     }
 }

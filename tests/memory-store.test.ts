@@ -17,14 +17,12 @@ describe("Memory Store", () => {
     it("Should emit Ready event when isReady is called", async () => {
         // given
         let isReady = false;
-        const store = new MemoryStore();
         store.on(HealthEvents.Ready, (status: boolean) => { isReady = status; });
         // when
         await store.isReady();
         // then
         expect(isReady).toEqual(true);
     });
-
 
     describe("set get remove", () => {
 

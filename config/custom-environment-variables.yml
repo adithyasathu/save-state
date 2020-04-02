@@ -1,8 +1,7 @@
-# FYI, config is only used for testing, as this repo is a node module it will not rely on the config folder for production
-settings:
+store:
   redis:
-    url: REDIS_URL
+    url: REDIS_CONNECTION_URL
   mongo:
-    url: MONGO_URL
+    url: MONGO_CONNECTION_URL
   elastic:
-    url: ELASTIC_URL
+    url: ELASTIC_CONNECTION_URL

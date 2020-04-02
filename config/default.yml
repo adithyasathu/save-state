@@ -1,7 +1,14 @@
-settings:
+store:
   redis:
     url: redis://localhost:6379
   mongo:
     url: mongodb://localhost:27017
+    db: store
+    collection: doc-store
+    driver:
+      auto_reconnect: false
+    retry:
+      secsWaitBetween: 3
+      secsAbortAfter: 300
   elastic:
     url: http://localhost:9001

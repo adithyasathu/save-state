@@ -1,0 +1,26 @@
+version: "2"
+services:
+  mongodb:
+    image: mongo:4
+    container_name: mongodb
+    volumes:
+      - /data/db
+    ports:
+      - "27017:27017"
+
+  mongodb-ui:
+    image: mongo-express
+    depends_on:
+      - mongodb
+    stdin_open: true
+    tty: true
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.container.hostname_override: container_name
+      io.rancher.scheduler.affinity:host_label: host_core=true
+    ports:
+      - 9005:8081/tcp
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: password
+      ME_CONFIG_MONGODB_SERVER: mongodb
