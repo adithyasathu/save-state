@@ -3,7 +3,8 @@
 Abstraction for data store with In-Memory cache, MongoDB, Redis and Elastic without worrying about the internal implementations
 
 
-
+[![Build Status](https://travis-ci.com/adithyasathu/save-state.svg?branch=master)](https://travis-ci.com/adithyasathu/save-state)
+[![codecov](https://codecov.io/gh/adithyasathu/save-state/branch/master/graph/badge.svg)](https://codecov.io/gh/adithyasathu/save-state)
 
 
 

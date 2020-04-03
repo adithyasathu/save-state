@@ -1,13 +1,13 @@
 {
   "name": "save-state",
-  "version": "1.0.0-alpha-0",
+  "version": "1.0.0-alpha-1",
   "description": "Abstraction for data store with In-Memory cache, MongoDB, Redis and Elastic without worrying about the internal implementations",
   "main": "lib/index.js",
   "types": "lib",
   "scripts": {
     "build": "tsc",
-    "test": "env NODE_ENV=test tsc && jest --coverage --env=node",
-    "coveralls": "env NODE_ENV=test  tsc && jest --coverage && coveralls < coverage/lcov.info"
+    "test": "npm run build && env NODE_ENV=test jest --coverage --env=node",
+    "codecov": "npm run test && codecov"
   },
   "author": "Adithya Sathu <adithya.sathu@gmail.com>",
   "license": "MIT",
@@ -33,11 +33,13 @@
     "save",
     "persist",
     "app-state",
-    "state"
+    "state",
+    "jest",
+    "Tracis CI",
+    "Codecov"
   ],
   "devDependencies": {
     "@types/config": "0.0.36",
-    "@types/debug": "^4.1.5",
     "@types/elasticsearch": "^5.0.24",
     "@types/events": "^3.0.0",
     "@types/jest": "^24.0.12",
@@ -45,10 +47,12 @@
     "@types/node": "^8.0.58",
     "@types/redis": "2.8.0",
     "@types/sinon": "^9.0.0",
+    "@types/sinon-as-promised": "^4.0.13",
     "@types/winston": "^2.4.4",
-    "coveralls": "^3.0.11",
+    "codecov": "^3.6.5",
     "jest": "^24.9.0",
     "sinon": "^9.0.1",
+    "sinon-as-promised": "^4.0.3",
     "ts-jest": "^24.0.2",
     "tslint": "^5.16.0",
     "typescript": "^3.8.3"
@@ -83,7 +87,7 @@
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/build/",
+      "/lib/",
       "/coverage/"
     ],
     "moduleFileExtensions": [

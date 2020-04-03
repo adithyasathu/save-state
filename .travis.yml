@@ -5,6 +5,8 @@ language: node_js
 node_js:
   - '10'
 
+services: mongodb
+
 cache:
   directories:
     - ./node_modules
@@ -13,4 +15,5 @@ install:
   - npm install
 
 script:
-  - npm run coveralls
+  - npm test
+  - codecov -f coverage/*.json
