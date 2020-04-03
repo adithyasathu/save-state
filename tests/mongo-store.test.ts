@@ -15,16 +15,19 @@ describe("Mongo Store - CRUD Operations", () => {
 
     const store = new MongoStore(validMongoOption);
 
-    beforeAll(async () => {
+    beforeAll(async (done) => {
         await store.connect();
+        done();
     });
 
-    afterEach(async  () => {
+    afterEach(async (done) => {
         await store.removeAll();
+        done();
     });
 
-    afterAll(async  () => {
+    afterAll(async (done) => {
         await store.disconnect();
+        done();
     });
 
     it("No documents - should be empty result on get keys",  (done) => {
@@ -89,8 +92,9 @@ describe("Mongo - BAD connection", () => {
             });
     });
 
-    afterAll(async () => {
+    afterAll(async (done) => {
         await badStore.disconnect();
+        done();
     });
 });
 
@@ -106,42 +110,57 @@ describe("MongoDB isReady and emit event" , () => {
 
     const store = new MongoStore(validMongoOption);
 
-    it("Should emit Ready event when DB connected", async () => {
+    beforeAll((done) => {
+        useFakeTimers();
+        done();
+    });
+
+    afterEach(async (done) => {
+        restore();
+        reset();
+        await store.disconnect();
+        done();
+    });
+
+    it("Should emit Ready event when DB connected", async (done) => {
         // given
         let isReady = false;
         store.on(HealthEvents.Ready, (status: boolean) => { isReady = status; });
         // when
         await store.connect();
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        clock.tick(100);
         // then
         expect(isReady).toEqual(true);
+        done();
     });
 
-    it("Should emit Ready(false) event when DB disconnected", async () => {
+    it("Should emit Ready(false) event when DB disconnected", async (done) => {
         // given
         let isReady = true;
         store.on(HealthEvents.Ready, (status: boolean) => { isReady = status; });
         // when
         await store.connect();
         await store.disconnect();
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        clock.tick(100);
         // then
         expect(isReady).toEqual(false);
+        done();
     });
 
-    it("Should emit Ready event when DB connected and isReady called", async () => {
+    it("Should emit Ready event when DB connected and isReady called", async (done) => {
         // given
         let isReady = false;
         store.on(HealthEvents.Ready, (status: boolean) => { isReady = status; });
         // when
         await store.connect();
         await store.isReady();
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        clock.tick(100);
         // then
         expect(isReady).toEqual(true);
+        done();
     });
 
-    it("Should emit Ready(false) event when DB disconnected and isReady called", async () => {
+    it("Should emit Ready(false) event when DB disconnected and isReady called", async (done) => {
         // given
         let isReady = true;
         store.on(HealthEvents.Ready, (status: boolean) => { isReady = status; });
@@ -149,9 +168,10 @@ describe("MongoDB isReady and emit event" , () => {
         await store.connect();
         await store.disconnect();
         await store.isReady();
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        clock.tick(100);
         // then
         expect(isReady).toEqual(false);
+        done();
     });
 
 });
@@ -195,10 +215,11 @@ describe("Mongo connection retry", () => {
             });
     });
 
-    afterAll(async () => {
+    afterEach(async (done) => {
         restore();
         reset();
         await store.disconnect();
+        done();
     });
 });
 
@@ -212,6 +233,11 @@ describe("MongoDB should check client initialization before any operation" , () 
     };
 
     const store = new MongoStore(validMongoOption);
+
+    afterAll(async (done) => {
+        await store.disconnect();
+        done();
+    });
 
     it("check client initialization before get", async (done) => {
         try {

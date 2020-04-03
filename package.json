@@ -6,7 +6,7 @@
   "types": "lib",
   "scripts": {
     "build": "tsc",
-    "test": "npm run build && env NODE_ENV=test jest --coverage --env=node",
+    "test": "npm run build && env NODE_ENV=test jest --coverage --env=node --detectOpenHandles",
     "codecov": "npm run test && codecov"
   },
   "author": "Adithya Sathu <adithya.sathu@gmail.com>",

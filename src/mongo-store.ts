@@ -57,7 +57,6 @@ export class MongoStore extends EventEmitter implements IStore {
         }).catch((err) =>  {
             log.error("Error while checking the health ", inspect(err));
             this.emit(HealthEvents.Ready, false);
-            return;
         });
     }
 
