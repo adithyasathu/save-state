@@ -29,13 +29,21 @@ Run `docker -v` to confirm docker is running
 
 ##### Docker images defined in compose file
 
-- **mongodb** - local DB instance Running on mongodb://localhost:27017
+- **mongodb** - local Mongo DB instance Running on mongodb://localhost:27017
 
 - **mongo-express** - Web based MongoDB admin interface running on http://localhost:9005/ 
+
 ```
 user id: admin
 password: password
 ```
+
+- **redis** - local RedisDB instance Running on redis://localhost:6379/0
+
+- **redis-commander** - Web based Redis admin interface running on http://localhost:8081/
+
+
+
 
 `docker ps -a` should show something like below
 ```

@@ -35,17 +35,18 @@
     "app-state",
     "state",
     "jest",
-    "Tracis CI",
+    "Travis CI",
     "Codecov"
   ],
   "devDependencies": {
+    "@types/bluebird": "^3.5.30",
     "@types/config": "0.0.36",
     "@types/elasticsearch": "^5.0.24",
     "@types/events": "^3.0.0",
     "@types/jest": "^24.0.12",
     "@types/mongodb": "3.0.4",
     "@types/node": "^8.0.58",
-    "@types/redis": "2.8.0",
+    "@types/redis": "^2.8.0",
     "@types/sinon": "^9.0.0",
     "@types/sinon-as-promised": "^4.0.13",
     "@types/winston": "^2.4.4",
@@ -58,6 +59,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "bluebird": "^3.7.2",
     "config": "^3.3.1",
     "elasticsearch": "^16.7.1",
     "events": "^3.1.0",

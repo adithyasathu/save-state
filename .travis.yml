@@ -5,7 +5,9 @@ language: node_js
 node_js:
   - '10'
 
-services: mongodb
+services:
+  - mongodb
+  - redis-server
 
 cache:
   directories:

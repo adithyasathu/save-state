@@ -8,6 +8,8 @@ services:
     ports:
       - "27017:27017"
 
+  # admin tool for MongoDB running on http://localhost:9005
+  # see Readme for more details
   mongodb-ui:
     image: mongo-express
     depends_on:
@@ -24,3 +26,30 @@ services:
       ME_CONFIG_BASICAUTH_USERNAME: admin
       ME_CONFIG_BASICAUTH_PASSWORD: password
       ME_CONFIG_MONGODB_SERVER: mongodb
+
+  redis:
+    image: redis:4
+    ports:
+      - "6379:6379"
+
+  # admin tool for Redis running on http://localhost:8081
+  # see Readme for more details
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+
+  elastic:
+      image: elasticsearch:5.6.9
+      environment:
+        - discovery.type=single-node
+        - bootstrap.memory_lock=false
+        - xpack.security.enabled=false
+        - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      ports:
+        - "9200:9200"
