@@ -5,6 +5,35 @@ export interface IHealthCheck {
     isReady(): Promise<void>;
 }
 
+export interface IStoreOptions {
+    url: string;
+    retry?: {
+        secsWaitBetween: number;
+        secsAbortAfter: number;
+    };
+}
+
+export interface IMongoStoreConfig extends IStoreOptions {
+    url: string;
+    db: string;
+    collection: string;
+    driver?: any;
+    retry?: {
+        secsWaitBetween: number;
+        secsAbortAfter: number;
+    };
+}
+
+export interface IRedisStoreConfig extends IStoreOptions {
+    url: string;
+    password?: string;
+    tls?: boolean;
+    retry?: {
+        secsWaitBetween: number;
+        secsAbortAfter: number;
+    };
+}
+
 export enum HealthEvents {
     Ready = "READY",
 }

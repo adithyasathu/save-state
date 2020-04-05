@@ -1,32 +1,20 @@
-import { RedisClient, Multi, createClient } from "redis";
+import { EventEmitter } from "events";
 import { promisifyAll } from "bluebird";
-import { promisify, inspect } from "util";
-import { EventEmitter} from "events";
 import { logger as log } from "./logger";
-import { IStore, HealthEvents } from "./interfaces";
+import { promisify, inspect } from "util";
+import { RedisClient, Multi, createClient } from "redis";
+import { IStore, HealthEvents, IRedisStoreConfig } from "./interfaces";
 
 const sleep = promisify(setTimeout);
 
 promisifyAll(RedisClient.prototype);
 promisifyAll(Multi.prototype);
 
-export interface IRedisStoreConfig {
-    connection: {
-        url: string;
-        password?: string;
-        tls?: boolean;
-        retry?: {
-            secsWaitBetween: number;
-            secsAbortAfter: number;
-        }
-    };
-}
-
 export class RedisStore extends EventEmitter implements IStore {
 
     private client: any;
 
-    constructor(private options: {connection: any}) {
+    constructor(private options: any) {
         super();
     }
 
@@ -96,31 +84,31 @@ export class RedisStore extends EventEmitter implements IStore {
 
     private async connectRetry(opt: IRedisStoreConfig) {
         let attempt = 1;
-        const redisOptions: any = { url: opt.connection.url };
+        const redisOptions: any = { url: opt.url };
 
         // use password if supplied
-        if (opt.connection.password) {
-            redisOptions.password = opt.connection.password;
+        if (opt.password) {
+            redisOptions.password = opt.password;
         }
 
         // set TLS settings if supplied
-        if (opt.connection.tls) {
+        if (opt.tls) {
             redisOptions.tls = {};
         }
 
-        if (!opt.connection.retry) {
-            opt.connection.retry = {
+        if (!opt.retry) {
+            opt.retry = {
                 secsWaitBetween: 0,
                 secsAbortAfter: 0,
             };
 
-            log.warn(`No Redis retry config supplied, using default: ${inspect(opt.connection.retry)}`);
+            log.warn(`No Redis retry config supplied, using default: ${inspect(opt.retry)}`);
         }
 
-        const timeFailAfter = Date.now() + (opt.connection.retry.secsAbortAfter * 1000);
+        const timeFailAfter = Date.now() + (opt.retry.secsAbortAfter * 1000);
 
         for (let i = 0; i >= 0; i++) {
-            if (i) { await sleep(opt.connection.retry.secsWaitBetween * 1000); }
+            if (i) { await sleep(opt.retry.secsWaitBetween * 1000); }
 
             try {
                 const client = createClient(redisOptions);

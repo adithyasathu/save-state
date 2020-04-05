@@ -1,23 +1,10 @@
-import { IStore, HealthEvents } from "./interfaces";
-import { MongoClient, Db } from "mongodb";
 import { EventEmitter } from "events";
 import { logger as log } from "./logger";
+import { MongoClient, Db } from "mongodb";
 import { promisify, inspect } from "util";
+import { IStore, HealthEvents, IMongoStoreConfig } from "./interfaces";
 
 const sleep = promisify(setTimeout);
-
-export interface IMongoStoreConfig {
-    connection: {
-        url: string;
-        db: string;
-        collection: string;
-        driver?: any;
-        retry?: {
-            secsWaitBetween: number;
-            secsAbortAfter: number;
-        };
-    };
-}
 
 export class MongoStore extends EventEmitter implements IStore {
     private client: any;
@@ -30,7 +17,7 @@ export class MongoStore extends EventEmitter implements IStore {
 
     public async connect() {
         this.client = await this.connectRetry(this.options);
-        this.db = this.client.db(this.options.connection.db);
+        this.db = this.client.db(this.options.db);
 
         this.db.once("error", (err) => {
             this.emit(HealthEvents.Ready, false);
@@ -47,7 +34,7 @@ export class MongoStore extends EventEmitter implements IStore {
 
         });
 
-        this.collection = this.db.collection(this.options.connection.collection);
+        this.collection = this.db.collection(this.options.collection);
         this.emit(HealthEvents.Ready, true);
     }
 
@@ -127,26 +114,26 @@ export class MongoStore extends EventEmitter implements IStore {
     private async connectRetry(opt: IMongoStoreConfig) {
         let attempt = 1;
 
-        if (!opt.connection.retry) {
-            opt.connection.retry = {
+        if (!opt.retry) {
+            opt.retry = {
                 secsWaitBetween: 0,
                 secsAbortAfter: 0,
             };
 
-            log.warn("No Mongo retry config supplied, using default: ", opt.connection.retry);
+            log.warn("No Mongo retry config supplied, using default: ", opt.retry);
         }
 
-        const timeFailAfter = Date.now() + (opt.connection.retry.secsAbortAfter * 1000);
+        const timeFailAfter = Date.now() + (opt.retry.secsAbortAfter * 1000);
 
         for (let i = 0; i >= 0; i++) {
             if (i) {
-                log.info(`wait for ${opt.connection.retry.secsWaitBetween} sec before retry`);
-                await sleep(opt.connection.retry.secsWaitBetween * 1000);
+                log.info(`wait for ${opt.retry.secsWaitBetween} sec before retry`);
+                await sleep(opt.retry.secsWaitBetween * 1000);
             }
 
             try {
-                log.info(`connection url ${opt.connection.url} `);
-                const client = await MongoClient.connect(opt.connection.url, opt.connection.driver);
+                log.info(`connection url ${opt.url} `);
+                const client = await MongoClient.connect(opt.url, opt.driver);
                 log.info("Mongo connection requested");
                 this.emit("connected");
 
@@ -157,7 +144,7 @@ export class MongoStore extends EventEmitter implements IStore {
 
                 this.emit("connectFail", attempt++, (url: string) => {
                     log.info(`connection url ${url}`);
-                    opt.connection.url = url;
+                    opt.url = url;
                 });
 
                 if (Date.now() >= timeFailAfter) { throw err; }

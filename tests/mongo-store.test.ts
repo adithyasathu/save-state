@@ -1,16 +1,13 @@
 import config from "config";
-import { IMongoStoreConfig, MongoStore } from "../src/mongo-store";
-import { HealthEvents, IStore } from "../src/interfaces";
+import { MongoStore } from "../src/mongo-store";
+import { HealthEvents, IStore, IMongoStoreConfig } from "../src/interfaces";
 import { useFakeTimers, clock, reset, restore } from "sinon";
-
 
 describe("Mongo Store - CRUD Operations", () => {
     const validMongoOption: IMongoStoreConfig = {
-        connection: {
-            url: config.get<string>("store.mongo.url"),
+            url: config.get<string>("mongo.url"),
             db: "test-db",
             collection: "test-collection",
-        },
     };
 
     const store = new MongoStore(validMongoOption);
@@ -39,9 +36,9 @@ describe("Mongo Store - CRUD Operations", () => {
     });
 
     it("Should set remove and get", async (done) => {
-        expect(await store.get(["boo"])).toMatchObject({ boo : {}});
-        await store.set({ boo : {  a : 1}});
-        await store.set({ foo : {  b : 23}, eoo : {c: {d : 45 } }});
+        expect(await store.get(["boo"])).toMatchObject({ boo : {} });
+        await store.set({ boo : {  a : 1 }});
+        await store.set({ foo : {  b : 23}, eoo : { c: { d : 45 } }});
         await store.set({});
         expect(await store.get(["boo", "foo", "eoo", "woo", "abc"])).toMatchObject({
             boo: {
@@ -72,13 +69,10 @@ describe("Mongo Store - CRUD Operations", () => {
 
 describe("Mongo - BAD connection", () => {
     const badConnection: IMongoStoreConfig = {
-        connection:
-            {
                 url: "mongodb://unknownhost:27017",
                 db: "test-db",
                 collection: "test-collection",
-            },
-    };
+            };
 
     const badStore = new MongoStore(badConnection);
 
@@ -101,11 +95,9 @@ describe("Mongo - BAD connection", () => {
 describe("MongoDB isReady and emit event" , () => {
 
     const validMongoOption: IMongoStoreConfig = {
-        connection: {
-            url: config.get<string>("store.mongo.url"),
+            url: config.get<string>("mongo.url"),
             db: "test-db",
             collection: "test-collection",
-        },
     };
 
     const store = new MongoStore(validMongoOption);
@@ -176,14 +168,12 @@ describe("MongoDB isReady and emit event" , () => {
 
 });
 
-
 describe("Mongo connection retry", () => {
     let store: IStore;
 
     beforeAll(() => {
         useFakeTimers();
         store = new MongoStore({
-            connection: {
                 url: "mongodb://some-rubbish-host-name:59999",
                 db: "test-db",
                 collection: "test-collection",
@@ -194,7 +184,6 @@ describe("Mongo connection retry", () => {
                     secsWaitBetween: 2,
                     secsAbortAfter: 15,
                 },
-            },
         });
     });
 
@@ -206,7 +195,7 @@ describe("Mongo connection retry", () => {
                 clock.tick(100);
                 failedTimes++;
                 if (2 === tryNumber) {
-                    setUrl(config.get<string>("store.mongo.url")); // now swap for real URL
+                    setUrl(config.get<string>("mongo.url")); // now swap for real URL
                 }
             })
             .on("connected", () => {
@@ -225,11 +214,9 @@ describe("Mongo connection retry", () => {
 
 describe("MongoDB should check client initialization before any operation" , () => {
     const validMongoOption: IMongoStoreConfig = {
-        connection: {
-            url: config.get<string>("store.mongo.url"),
+            url: config.get<string>("mongo.url"),
             db: "test-db",
             collection: "test-collection",
-        },
     };
 
     const store = new MongoStore(validMongoOption);

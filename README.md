@@ -6,51 +6,117 @@ Abstraction for data store with In-Memory cache, MongoDB, Redis and Elastic with
 [![Build Status](https://travis-ci.com/adithyasathu/save-state.svg?branch=master)](https://travis-ci.com/adithyasathu/save-state)
 [![codecov](https://codecov.io/gh/adithyasathu/save-state/branch/master/graph/badge.svg)](https://codecov.io/gh/adithyasathu/save-state)
 
+## Installation
 
-
-
-
-
-
-
-
-
-
-#### Local setup using Docker:
-
-Prerequisite - Install Docker
-
-- Mac: https://docs.docker.com/docker-for-mac/install/  
-- Windows: https://docs.docker.com/docker-for-windows/
-
-Run `docker -v` to confirm docker is running
-
-`docker-compose up` to start all the docker images required for setup
-
-##### Docker images defined in compose file
-
-- **mongodb** - local Mongo DB instance Running on mongodb://localhost:27017
-
-- **mongo-express** - Web based MongoDB admin interface running on http://localhost:9005/ 
-
-```
-user id: admin
-password: password
+```bash
+npm install save-store
 ```
 
-- **redis** - local RedisDB instance Running on redis://localhost:6379/0
+## Usage
 
-- **redis-commander** - Web based Redis admin interface running on http://localhost:8081/
+#### Example
 
+```js
+const Store = require("save-store");
+const client = Store.createClient();
 
+// register listener
+client.on(HealthEvents.Ready, (status) => {
+    console.log(`Store connection ${status ? "ready" : "failure"}`);
+});
 
+client.connect();
 
-`docker ps -a` should show something like below
 ```
-adithya.sathu$ docker ps -a
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                      NAMES
-d5c090888ef0        mongo-express       "tini -- /docker-ent…"   29 hours ago        Up 29 hours         0.0.0.0:9005->8081/tcp     save-state_mongodb-ui_1
-85683df259ba        mongo:4             "docker-entrypoint.s…"   29 hours ago        Up 29 hours         0.0.0.0:27017->27017/tcp   mongodb
+
+**createClient** takes optional data store config, with no config passed returns In-Memory Store Client
+
+Example below shows Mongo Client creation with mongo store config
+
+
+```js
+const client = Store.createClient(
+    {
+        mongo: {
+            collection: "example-collection",
+            db: "example",
+            url: "mongodb://localhost:27017",
+        },
+    });
 ```
 
-`docker logs <CONTAINER ID>` would show docker logs of that container
+
+##### set API
+
+**set** takes JSON document whose key is string and value is a document. Can pass more than one document to be saved at once.
+
+```js
+
+// save document
+client.set({ boo : {  a : 1}});
+
+// save multiple documents
+client.set({
+    foo : { b : 23 },
+    eoo : { c : { d : 45 } },
+});
+
+// save multiple documents
+client.set({
+             "key-1" : {  ...document-1 },
+             "key-2" : {  ...document-2 },
+             // ..
+             "key-n" : {  ...document-n },
+});
+
+```
+
+
+```js
+
+client.set({ yoo: "not a document"}) // throws error
+
+```
+
+
+##### get API
+
+**get** takes array of strings (keys) to fetch documents from data store.
+
+```js
+
+// retrieve document
+client.get(["key-1"]);
+
+// save retrieve documents
+client.get(["key-1", "key-2"]);
+
+```
+
+##### remove API
+
+**remove** takes a string (key) to delete document from data store.
+
+```js
+
+// delete document
+client.remove("key-1");
+
+```
+
+
+
+##### removeAll API
+
+**removeAll**  deletes all document from data store.
+
+```js
+
+// delete document
+client.removeAll();
+
+```
+
+
+
+* Developer notes on [local setup](./docs/local-setup.md)

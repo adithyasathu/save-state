@@ -1,13 +1,11 @@
 import config from "config";
-import { IRedisStoreConfig, RedisStore } from "../src/redis-store";
-import { HealthEvents, IStore } from "../src/interfaces";
+import { RedisStore } from "../src/redis-store";
+import { HealthEvents, IStore, IRedisStoreConfig } from "../src/interfaces";
 import { useFakeTimers, clock, reset, restore } from "sinon";
 
 describe("Redis Store - CRUD Operations", () => {
     const validRedisOption: IRedisStoreConfig = {
-        connection: {
-            url: config.get<string>("store.redis.url"),
-        },
+            url: config.get<string>("redis.url"),
     };
 
     const store = new RedisStore(validRedisOption);
@@ -66,10 +64,7 @@ describe("Redis Store - CRUD Operations", () => {
 
 describe("Redis - BAD connection", () => {
     const badConnection: IRedisStoreConfig = {
-        connection:
-            {
                 url: "redis://unknownhost:6379",
-            },
     };
 
     const badStore = new RedisStore(badConnection);
@@ -99,9 +94,7 @@ describe("Redis - BAD connection", () => {
 describe("RedisDB isReady and emit event" , () => {
 
     const validRedisOption: IRedisStoreConfig = {
-        connection: {
-            url: config.get<string>("store.redis.url"),
-        },
+            url: config.get<string>("redis.url"),
     };
 
     const store = new RedisStore(validRedisOption);
@@ -180,13 +173,11 @@ describe("Redis connection retry", () => {
     beforeAll(() => {
         useFakeTimers();
         store = new RedisStore({
-            connection: {
                 url: "redis://some-rubbish-host-name:59999",
                 retry: {
                     secsWaitBetween: 2,
                     secsAbortAfter: 15,
                 },
-            },
         });
     });
 
@@ -198,7 +189,7 @@ describe("Redis connection retry", () => {
             clock.tick(100);
             failedTimes++;
             if (2 === tryNumber) {
-                setUrl(config.get<string>("store.redis.url")); // now swap for real URL
+                setUrl(config.get<string>("redis.url")); // now swap for real URL
             }
         })
             .on("connected", () => {
@@ -217,9 +208,7 @@ describe("Redis connection retry", () => {
 
 describe("RedisDB should check client initialization before any operation" , () => {
     const validRedisOption: IRedisStoreConfig = {
-        connection: {
-            url: config.get<string>("store.redis.url"),
-        },
+            url: config.get<string>("redis.url"),
     };
 
     const store = new RedisStore(validRedisOption);

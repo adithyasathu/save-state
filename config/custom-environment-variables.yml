@@ -1,7 +1,18 @@
-store:
-  redis:
-    url: REDIS_CONNECTION_URL
-  mongo:
-    url: MONGO_CONNECTION_URL
-  elastic:
-    url: ELASTIC_CONNECTION_URL
+redis:
+  url: REDIS_CONNECTION_URL
+  password: REDIS_CONNECTION_PASSWORD
+  tls: REDIS_CONNECTION_TLS
+  retry:
+    secsWaitBetween: REDIS_CONNECTION_RETRY_WAIT
+    secsAbortAfter: REDIS_CONNECTION_RETRY_ABORT
+mongo:
+  url: MONGO_CONNECTION_URL
+  db: MONGO_DB_NAME
+  collection: MONGO_COLLECTION_NAME
+  driver:
+    auto_reconnect: MONGO_AUTO_RECONNECT
+  retry:
+    secsWaitBetween: MONGO_CONNECTION_RETRY_WAIT
+    secsAbortAfter: MONGO_CONNECTION_RETRY_WAIT
+elastic:
+  url: ELASTIC_CONNECTION_URL
