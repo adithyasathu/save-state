@@ -5,9 +5,10 @@ language: node_js
 node_js:
   - '10'
 
-jdk:
-  - openjdk11
-
+addons:
+  apt:
+    packages:
+      - oracle-java11-installer
 
 before_install:
   - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.6.2-amd64.deb && sudo dpkg -i --force-confnew elasticsearch-7.6.2-amd64.deb && sudo service elasticsearch restart
@@ -16,6 +17,7 @@ services:
   - mongodb
   - redis-server
   - elasticsearch
+
 cache:
   directories:
     - ./node_modules
