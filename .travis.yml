@@ -8,7 +8,7 @@ node_js:
 services:
   - mongodb
   - redis-server
-
+  - elasticsearch
 cache:
   directories:
     - ./node_modules
