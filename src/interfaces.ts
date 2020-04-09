@@ -5,15 +5,7 @@ export interface IHealthCheck {
     isReady(): Promise<void>;
 }
 
-export interface IStoreOptions {
-    url: string;
-    retry?: {
-        secsWaitBetween: number;
-        secsAbortAfter: number;
-    };
-}
-
-export interface IMongoStoreConfig extends IStoreOptions {
+export interface IMongoStoreConfig {
     url: string;
     db: string;
     collection: string;
@@ -24,7 +16,7 @@ export interface IMongoStoreConfig extends IStoreOptions {
     };
 }
 
-export interface IRedisStoreConfig extends IStoreOptions {
+export interface IRedisStoreConfig {
     url: string;
     password?: string;
     tls?: boolean;
@@ -33,6 +25,19 @@ export interface IRedisStoreConfig extends IStoreOptions {
         secsAbortAfter: number;
     };
 }
+
+export interface IElasticStoreConfig {
+    url: string;
+    index: string;
+    type: string;
+    apiVersion?: string;
+    retry?: {
+        secsWaitBetween: number;
+        secsAbortAfter: number;
+    };
+}
+
+export type IStoreOptions = IMongoStoreConfig | IRedisStoreConfig | IElasticStoreConfig;
 
 export enum HealthEvents {
     Ready = "READY",

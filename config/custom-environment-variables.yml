@@ -13,6 +13,12 @@ mongo:
     auto_reconnect: MONGO_AUTO_RECONNECT
   retry:
     secsWaitBetween: MONGO_CONNECTION_RETRY_WAIT
-    secsAbortAfter: MONGO_CONNECTION_RETRY_WAIT
+    secsAbortAfter: MONGO_CONNECTION_RETRY_ABORT
 elastic:
   url: ELASTIC_CONNECTION_URL
+  apiVersion: ELASTIC_API_VERSION
+  index: ELASTIC_INDEX
+  type: ELASTIC_TYPE
+  retry:
+    secsWaitBetween: ELASTIC_CONNECTION_RETRY_WAIT
+    secsAbortAfter: ELASTIC_CONNECTION_RETRY_ABORT

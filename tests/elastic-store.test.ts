@@ -1,16 +1,16 @@
 import config from "config";
-import { MongoStore } from "../src/mongo-store";
-import { HealthEvents, IStore, IMongoStoreConfig } from "../src/interfaces";
+import { ElasticStore } from "../src/elastic-store";
+import { HealthEvents, IStore, IElasticStoreConfig } from "../src/interfaces";
 import { useFakeTimers, clock, reset, restore } from "sinon";
 
-describe("Mongo Store - CRUD Operations", () => {
-    const validMongoOption: IMongoStoreConfig = {
-            url: config.get<string>("mongo.url"),
-            db: "test-db",
-            collection: "test-collection",
+describe("Elastic Store - CRUD Operations", () => {
+    const validElasticOption: IElasticStoreConfig = {
+            url: config.get<string>("elastic.url"),
+            index: "test",
+            type: "test-type",
     };
 
-    const store = new MongoStore(validMongoOption);
+    const store = new ElasticStore(validElasticOption);
 
     beforeAll(async (done) => {
         await store.connect();
@@ -30,7 +30,9 @@ describe("Mongo Store - CRUD Operations", () => {
     it("No documents - should be empty result on get keys",  (done) => {
         store.get(["test"]).then(
             (result) => {
-                expect(result).toMatchObject({test: {}});
+                // tslint:disable:no-console
+                console.log("result ", JSON.stringify(result));
+                expect(result).toMatchObject({ test: null });
                 done();
             });
     });
@@ -56,7 +58,7 @@ describe("Mongo Store - CRUD Operations", () => {
             abc: null,
         });
         await store.remove("eoo");
-        expect(await store.get(["eoo"])).toMatchObject({ eoo : {}});
+        expect(await store.get(["eoo"])).toMatchObject({ eoo : null});
         await store.set({ boo : {  a : 2 }});
         expect(await store.get(["boo"])).toMatchObject({ boo : { a: 2}});
         done();
@@ -64,14 +66,14 @@ describe("Mongo Store - CRUD Operations", () => {
 
 });
 
-describe("Mongo - BAD connection", () => {
-    const badConnection: IMongoStoreConfig = {
-                url: "mongodb://unknownhost:27017",
-                db: "test-db",
-                collection: "test-collection",
+describe("Elastic - BAD connection", () => {
+    const badConnection: IElasticStoreConfig = {
+                url: "unknownhost:9200",
+                index: "test",
+                type: "test-type",
             };
 
-    const badStore = new MongoStore(badConnection);
+    const badStore = new ElasticStore(badConnection);
 
     it("Should fail on bad connection",  (done) => {
 
@@ -89,15 +91,15 @@ describe("Mongo - BAD connection", () => {
     });
 });
 
-describe("MongoDB isReady and emit event" , () => {
+describe("ElasticDB isReady and emit event" , () => {
 
-    const validMongoOption: IMongoStoreConfig = {
-            url: config.get<string>("mongo.url"),
-            db: "test-db",
-            collection: "test-collection",
+    const validElasticOption: IElasticStoreConfig = {
+            url: config.get<string>("elastic.url"),
+            index: "test",
+            type: "test-type",
     };
 
-    const store = new MongoStore(validMongoOption);
+    const store = new ElasticStore(validElasticOption);
 
     beforeAll((done) => {
         useFakeTimers();
@@ -165,15 +167,15 @@ describe("MongoDB isReady and emit event" , () => {
 
 });
 
-describe("Mongo connection retry", () => {
+describe("Elastic connection retry", () => {
     let store: IStore;
 
     beforeAll(() => {
         useFakeTimers();
-        store = new MongoStore({
-                url: "mongodb://some-rubbish-host-name:59999",
-                db: "test-db",
-                collection: "test-collection",
+        store = new ElasticStore({
+                url: "some-rubbish-host-name:59999",
+                index: "test",
+                type: "test-type",
                 driver: {
                     auto_reconnect: false,
                 },
@@ -192,7 +194,7 @@ describe("Mongo connection retry", () => {
                 clock.tick(100);
                 failedTimes++;
                 if (2 === tryNumber) {
-                    setUrl(config.get<string>("mongo.url")); // now swap for real URL
+                    setUrl(config.get<string>("elastic.url")); // now swap for real URL
                 }
             })
             .on("connected", () => {
@@ -209,14 +211,14 @@ describe("Mongo connection retry", () => {
     });
 });
 
-describe("MongoDB should check client initialization before any operation" , () => {
-    const validMongoOption: IMongoStoreConfig = {
-            url: config.get<string>("mongo.url"),
-            db: "test-db",
-            collection: "test-collection",
+describe("ElasticDB should check client initialization before any operation" , () => {
+    const validElasticOption: IElasticStoreConfig = {
+            url: config.get<string>("elastic.url"),
+            index: "test",
+            type: "test-type",
     };
 
-    const store = new MongoStore(validMongoOption);
+    const store = new ElasticStore(validElasticOption);
 
     afterAll(async (done) => {
         await store.disconnect();

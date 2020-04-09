@@ -34,7 +34,7 @@ await client.set({ yoo: "no document fail"}).catch((err) => {
 
 // get multiple documents
 await client.get(["boo", "foo", "eoo", "yoo"]).then((result) => {
-    console.log(`Documents retrieved ${result}`);
+    console.log(`Documents retrieved ${JSON.stringify(result)}`);
 }).catch((err) => {
     console.log(`Error while retrieving documents ${err}`);
 });

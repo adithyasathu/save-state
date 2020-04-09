@@ -1,11 +1,10 @@
 /* tslint:disable:no-console */
-
 const { Store, HealthEvents } = require("../lib");
 
 const client = Store.createClient(
     {
-        redis: {
-            url: "redis://localhost:6379/0",
+        elastic: {
+            url: "localhost:9200",
         },
     });
 
@@ -23,7 +22,7 @@ const client = Store.createClient(
     await client.set({ boo : {  a : 1}});
 
 // save multiple documents
-    await client.set({ foo : {  b : 23}, eoo : { c: {d : 45 } }});
+    await client.set({ foo : {  b : 29}, eoo : { c: { d : 45, e: 56 } }});
 
 // cant save wrong format
     await client.set({ yoo: "no document fail"}).catch((err) => {

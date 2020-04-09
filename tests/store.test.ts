@@ -14,7 +14,7 @@ describe("Store - Client Creation", () => {
         try {
            client =  Store.createClient({ wrong: { config: "here"}});
         } catch (e) {
-            expect(e.message).toBe("config options are invalid");
+            expect(e.message).toBe(`Configuration property "wrong" is not defined`);
         } finally {
             expect(client).toBeUndefined();
             done();

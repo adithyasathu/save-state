@@ -15,4 +15,10 @@ mongo:
     secsWaitBetween: 3
     secsAbortAfter: 300
 elastic:
-  url: http://localhost:9001
+  url: localhost:9200
+  apiVersion: "7.4"
+  index: store
+  type: doc-store
+  retry:
+    secsWaitBetween: 3
+    secsAbortAfter: 300

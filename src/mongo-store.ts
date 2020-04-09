@@ -11,7 +11,7 @@ export class MongoStore extends EventEmitter implements IStore {
     private db: Db;
     private collection: any;
 
-    public constructor(private options: IMongoStoreConfig) {
+    public constructor(private options: any) {
         super();
     }
 
@@ -73,7 +73,7 @@ export class MongoStore extends EventEmitter implements IStore {
         }
         const docs = await this.collection.find({_id : { $in : keys }}).toArray();
         const mapping: any = {};
-        keys.forEach((k) => mapping[k] = {});
+        keys.forEach((k) => mapping[k] = null);
         // There should always be a one to one map
         for (const result of docs) {
             mapping[result._id] = result;
@@ -92,20 +92,12 @@ export class MongoStore extends EventEmitter implements IStore {
         const operations: any []  = [];
         keys.forEach((key) => {
             const value = mappings[key];
-            if (value._id) {
-                operations.push({
+            operations.push({
                     replaceOne: {
                         filter : { _id : key },
                         replacement : value,
+                        upsert : true,
                     },
-                });
-                return;
-            }
-            value._id = key;
-            operations.push({
-                insertOne: {
-                    document: value,
-                },
             });
         });
         return this.collection.bulkWrite(operations);
