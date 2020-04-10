@@ -1,9 +1,9 @@
-/* tslint:disable:no-console */
-import {HealthEvents, IStore} from "../src/interfaces";
 import { Store } from "../src";
-import {MemoryStore} from "../src/memory-store";
-import {MongoStore} from "../src/mongo-store";
-import {RedisStore} from "../src/redis-store";
+import { MemoryStore } from "../src/memory-store";
+import { MongoStore } from "../src/mongo-store";
+import { RedisStore } from "../src/redis-store";
+import { ElasticStore } from "../src/elastic-store";
+import { HealthEvents, IStore } from "../src/interfaces";
 
 describe("Store - Client Creation", () => {
 
@@ -38,6 +38,19 @@ describe("Store - Client Creation", () => {
     it("Should fail to create redis store when invalid redis config supplied", async (done) => {
         try {
             client = Store.createClient({ redis: { wrong: "config" }});
+            await client.connect();
+        } catch (e) {
+            expect(e.message).toBeDefined();
+        }  finally {
+            await client.disconnect();
+            done();
+        }
+
+    });
+
+    it("Should fail to create elastic store when invalid elastic config supplied", async (done) => {
+        try {
+            client = Store.createClient({ elastic: { wrong: "config" }});
             await client.connect();
         } catch (e) {
             expect(e.message).toBeDefined();
@@ -99,7 +112,7 @@ describe("Store - Client Creation", () => {
     });
 
 
-    it("Should create redis client when mongo redis supplied", async (done) => {
+    it("Should create redis client when redis config supplied", async (done) => {
         client = Store.createClient(
             {
                 redis: {
@@ -114,6 +127,26 @@ describe("Store - Client Creation", () => {
         // then
         expect(isReady).toEqual(true);
         expect(client instanceof RedisStore).toEqual(true);
+        // cleanup
+        await client.disconnect();
+        done();
+    });
+
+    it("Should create elastic client when elastic config supplied", async (done) => {
+        client = Store.createClient(
+            {
+                elastic: {
+                    url: "localhost:9200",
+                },
+            });
+        // given
+        let isReady = false;
+        client.on(HealthEvents.Ready, (status: boolean) => { isReady = status; });
+        // when
+        await client.connect();
+        // then
+        expect(isReady).toEqual(true);
+        expect(client instanceof ElasticStore).toEqual(true);
         // cleanup
         await client.disconnect();
         done();

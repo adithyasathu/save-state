@@ -1,4 +1,5 @@
 import { EventEmitter } from "events";
+import { validate } from "./validator";
 import { logger as log } from "./logger";
 import { MongoClient, Db } from "mongodb";
 import { promisify, inspect } from "util";
@@ -39,6 +40,9 @@ export class MongoStore extends EventEmitter implements IStore {
     }
 
     public isReady(): Promise<void> {
+        if (!this.db) {
+            throw new Error("Client is not initialized");
+        }
         return this.db.stats().then(() => {
             this.emit(HealthEvents.Ready, true);
         }).catch((err) =>  {
@@ -48,9 +52,11 @@ export class MongoStore extends EventEmitter implements IStore {
     }
 
     public async disconnect() {
-        if (this.client) {
-            return this.client.close();
+        if (!this.client) {
+            throw new Error("Client is not initialized");
         }
+        return this.client.close();
+
     }
 
     public async removeAll() {
@@ -63,6 +69,8 @@ export class MongoStore extends EventEmitter implements IStore {
     public async remove(key: string) {
         if (!this.client) {
             throw new Error("Client is not initialized");
+        } else if (!key) {
+            throw new Error("not a valid key");
         }
         return this.collection.deleteOne({_id: key});
     }
@@ -70,6 +78,9 @@ export class MongoStore extends EventEmitter implements IStore {
     public async get(keys: string[]) {
         if (!this.client) {
             throw new Error("Client is not initialized");
+        }
+        if (!keys || keys.length === 0 || keys.includes("")) {
+            throw new Error("invalid keys");
         }
         const docs = await this.collection.find({_id : { $in : keys }}).toArray();
         const mapping: any = {};
@@ -85,10 +96,10 @@ export class MongoStore extends EventEmitter implements IStore {
         if (!this.client) {
             throw new Error("Client is not initialized");
         }
-        const keys = Object.keys(mappings);
-        if (keys.length === 0) {
-            return;
+        if (!validate(mappings)) {
+            throw new Error("not a valid object to save");
         }
+        const keys = Object.keys(mappings);
         const operations: any []  = [];
         keys.forEach((key) => {
             const value = mappings[key];

@@ -21,23 +21,31 @@ describe("Redis Store - CRUD Operations", () => {
     });
 
     afterAll(async (done) => {
-        await store.disconnect();
+        await store.disconnect().catch((err) => { /* do nothing */ });
         done();
     });
 
     it("No documents - should be empty result on get keys",  (done) => {
         store.get(["test"]).then(
             (result) => {
-                expect(result).toMatchObject({test: {}});
+                expect(result).toMatchObject({test: null});
                 done();
             });
     });
 
     it("Should set remove and get", async (done) => {
-        expect(await store.get(["boo"])).toMatchObject({ boo : {}});
-        await store.set({ boo : {  a : 1}});
-        await store.set({ foo : {  b : 23}, eoo : {c: {d : 45 } }});
-        await store.set({});
+        expect(await store.get(["boo"])).toMatchObject({ boo : null });
+        // save one document
+        await store.set({ boo : {  a : 1 }});
+        // save multiple documents
+        await store.set({ foo : {  b : 23}, eoo : { c: { d : 45 } }});
+        // validate mapping object
+        await store.set({}).catch((err) => { expect(err.message).toBe("not a valid object to save"); });
+        await store.set(null).catch((err) => { expect(err.message).toBe("not a valid object to save"); });
+        // validate get API
+        await store.get([]).catch((err) => { expect(err.message).toBe("invalid keys"); });
+        await store.get(["", ""]).catch((err) => { expect(err.message).toBe("invalid keys"); });
+        // retrieve multiple documents
         expect(await store.get(["boo", "foo", "eoo", "woo", "abc"])).toMatchObject({
             boo: {
                 a: 1,
@@ -50,12 +58,18 @@ describe("Redis Store - CRUD Operations", () => {
                     d: 45,
                 },
             },
-            woo: {},
-            abc: {},
+            woo: null,
+            abc: null,
         });
+        // validate key
+        await store.remove("").catch((err) => { expect(err.message).toBe("not a valid key"); });
+        // remove a document
         await store.remove("eoo");
-        expect(await store.get(["eoo"])).toMatchObject({ eoo : {}});
+        // retrieve removed document
+        expect(await store.get(["eoo"])).toMatchObject({ eoo : null});
+        // update saved document
         await store.set({ boo : {  a : 2 }});
+        // check updated document
         expect(await store.get(["boo"])).toMatchObject({ boo : { a: 2}});
         done();
     });
@@ -71,13 +85,7 @@ describe("Redis - BAD connection", () => {
 
     it("Should throw error on bad connection",  (done) => {
 
-        /*try {
-          await badStore.connect();
-        } catch (err) {
-            expect(err).toBeDefined();
-            done();
-        }*/
-        badStore.connect()
+         badStore.connect()
             .then(() => done(new Error("Should not be ok")))
             .catch((err) => {
                 expect(err).toBeDefined();
@@ -86,7 +94,7 @@ describe("Redis - BAD connection", () => {
     });
 
     afterAll(async (done) => {
-        await badStore.disconnect();
+        await badStore.disconnect().catch((err) => { /* do nothing */ });
         done();
     });
 });
@@ -107,7 +115,7 @@ describe("RedisDB isReady and emit event" , () => {
     afterEach(async (done) => {
         restore();
         reset();
-        await store.disconnect();
+        await store.disconnect().catch((err) => { /* do nothing */ });
         done();
     });
 
@@ -201,7 +209,7 @@ describe("Redis connection retry", () => {
     afterEach(async (done) => {
         restore();
         reset();
-        await store.disconnect();
+        await store.disconnect().catch((err) => { /* do nothing */ });
         done();
     });
 });
@@ -214,8 +222,19 @@ describe("RedisDB should check client initialization before any operation" , () 
     const store = new RedisStore(validRedisOption);
 
     afterAll(async (done) => {
-        await store.disconnect();
+        await store.disconnect().catch((err) => { /* do nothing */ });
         done();
+    });
+
+    it("check client initialization before isReady", async (done) => {
+        try {
+            await store.isReady();
+        } catch (error) {
+            expect(error.message).toBe("Client is not initialized");
+        } finally {
+            done();
+        }
+
     });
 
     it("check client initialization before get", async (done) => {

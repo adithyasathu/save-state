@@ -1,8 +1,9 @@
-import { IStore, HealthEvents, IElasticStoreConfig } from "./interfaces";
-import { Client } from "elasticsearch";
-import { logger as log } from "./logger";
 import { inspect } from "util";
 import { EventEmitter } from "events";
+import { Client } from "elasticsearch";
+import { logger as log } from "./logger";
+import { IStore, HealthEvents, IElasticStoreConfig } from "./interfaces";
+import {validate} from "./validator";
 
 export class ElasticStore extends EventEmitter implements IStore {
     public client: Client;
@@ -29,7 +30,9 @@ export class ElasticStore extends EventEmitter implements IStore {
     }
 
     public async disconnect() {
-        if (!this.client) {  return; }
+        if (!this.client) {
+            throw new Error("Client is not initialized");
+        }
         this.emit(HealthEvents.Ready, false);
         return this.client.close();
     }
@@ -38,8 +41,8 @@ export class ElasticStore extends EventEmitter implements IStore {
         if (!this.client) {
             throw new Error("Client is not initialized");
         }
-        if (!keys || keys.length === 0) {
-            return "nothing to query";
+        if (!keys || keys.length === 0 || keys.includes("")) {
+            throw new Error("invalid keys");
         }
         return this.client.mget({
                 index: this.options.index,
@@ -64,8 +67,9 @@ export class ElasticStore extends EventEmitter implements IStore {
     public async remove(key: string) {
         if (!this.client) {
             throw new Error("Client is not initialized");
+        } else if (!key) {
+            throw new Error("not a valid key");
         }
-
         await this.client.delete({
             index: this.options.index,
             type : this.options.type,
@@ -78,15 +82,10 @@ export class ElasticStore extends EventEmitter implements IStore {
         if (!this.client) {
             throw new Error("Client is not initialized");
         }
-
-        await this.client.deleteByQuery({
+        // delete the index
+        await this.client.indices.delete({
           index: this.options.index,
           ignoreUnavailable: true,
-          body: {
-                query: {
-                match_all: {},
-             },
-          },
         });
 
     }
@@ -95,11 +94,10 @@ export class ElasticStore extends EventEmitter implements IStore {
         if (!this.client) {
             throw new Error("Client is not initialized");
         }
-
-        const keys = Object.keys(mappings);
-        if (keys.length === 0) {
-            return;
+        if (!validate(mappings)) {
+            throw new Error("not a valid object to save");
         }
+        const keys = Object.keys(mappings);
         let body = "";
         const indexName = this.options.index;
         const typeName = this.options.type;

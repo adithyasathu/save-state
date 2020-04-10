@@ -1,4 +1,4 @@
-### save-state (WIP)
+### save-state
 
 Abstraction for data store with In-Memory cache, MongoDB, Redis and Elastic without worrying about the internal implementations
 
@@ -31,7 +31,9 @@ client.connect();
 
 **createClient** takes optional data store config, with no config passed returns In-Memory Store Client
 
-Example below shows Mongo Client creation with mongo store config
+Examples below 
+ 
+- **Mongo Client**
 
 
 ```js
@@ -44,6 +46,36 @@ const client = Store.createClient(
         },
     });
 ```
+
+
+- **Redis Client**
+
+
+```js
+const client = Store.createClient(
+    {
+        redis: {
+            url: "redis://localhost:6379/0",
+        },
+    });
+```
+
+
+
+- **Elasticsearch Client**
+
+
+```js
+const client = Store.createClient(
+    {
+        redis : {
+            url: "localhost:9200",
+            index: "example-index",
+            type: "example-type",
+         },
+    });
+```
+
 
 
 ##### set API
@@ -88,7 +120,7 @@ client.set({ yoo: "not a document"}) // throws error
 // retrieve document
 client.get(["key-1"]);
 
-// save retrieve documents
+// retrieve multiple documents
 client.get(["key-1", "key-2"]);
 
 ```

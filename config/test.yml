@@ -17,7 +17,7 @@ mongo:
 elastic:
   url: localhost:9200
   index: store
-  apiVersion: "7.4"
+  apiVersion: "7.6"
   type: doc-store
   retry:
     secsWaitBetween: 3

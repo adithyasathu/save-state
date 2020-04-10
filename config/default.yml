@@ -16,7 +16,7 @@ mongo:
     secsAbortAfter: 300
 elastic:
   url: localhost:9200
-  apiVersion: "7.4"
+  apiVersion: "7.6"
   index: store
   type: doc-store
   retry:

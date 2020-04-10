@@ -23,7 +23,7 @@ describe("Mongo Store - CRUD Operations", () => {
     });
 
     afterAll(async (done) => {
-        await store.disconnect();
+        await store.disconnect().catch((err) => { /* do nothing */ });
         done();
     });
 
@@ -37,9 +37,20 @@ describe("Mongo Store - CRUD Operations", () => {
 
     it("Should set remove and get", async (done) => {
         expect(await store.get(["boo"])).toMatchObject({ boo : null });
+        // save one document
         await store.set({ boo : {  a : 1 }});
+        // save multiple documents
         await store.set({ foo : {  b : 23}, eoo : { c: { d : 45 } }});
-        await store.set({});
+        // validate mapping object
+        await store.set({}).catch((err) => { expect(err.message).toBe("not a valid object to save"); });
+        await store.set(null).catch((err) => { expect(err.message).toBe("not a valid object to save"); });
+        // validate get API
+        await store.get([]).catch((err) => { expect(err.message).toBe("invalid keys"); });
+        await store.get(["", ""]).catch((err) => { expect(err.message).toBe("invalid keys"); });
+        // validate mapping object
+        await store.set({}).catch((err) => { expect(err.message).toBe("not a valid object to save"); });
+        await store.set(null).catch((err) => { expect(err.message).toBe("not a valid object to save"); });
+        // retrieve multiple documents
         expect(await store.get(["boo", "foo", "eoo", "woo", "abc"])).toMatchObject({
             boo: {
                 a: 1,
@@ -55,9 +66,15 @@ describe("Mongo Store - CRUD Operations", () => {
             woo: null,
             abc: null,
         });
+        // validate key
+        await store.remove("").catch((err) => { expect(err.message).toBe("not a valid key"); });
+        // remove a document
         await store.remove("eoo");
-        expect(await store.get(["eoo"])).toMatchObject({ eoo : {}});
+        // retrieve removed document
+        expect(await store.get(["eoo"])).toMatchObject({ eoo : null});
+        // update saved document
         await store.set({ boo : {  a : 2 }});
+        // check updated document
         expect(await store.get(["boo"])).toMatchObject({ boo : { a: 2}});
         done();
     });
@@ -84,7 +101,7 @@ describe("Mongo - BAD connection", () => {
     });
 
     afterAll(async (done) => {
-        await badStore.disconnect();
+        await badStore.disconnect().catch((err) => { /* do nothing */ });
         done();
     });
 });
@@ -107,7 +124,7 @@ describe("MongoDB isReady and emit event" , () => {
     afterEach(async (done) => {
         restore();
         reset();
-        await store.disconnect();
+        await store.disconnect().catch((err) => { /* do nothing */ });
         done();
     });
 
@@ -204,7 +221,7 @@ describe("Mongo connection retry", () => {
     afterEach(async (done) => {
         restore();
         reset();
-        await store.disconnect();
+        await store.disconnect().catch((err) => { /* do nothing */ });
         done();
     });
 });
@@ -219,8 +236,19 @@ describe("MongoDB should check client initialization before any operation" , () 
     const store = new MongoStore(validMongoOption);
 
     afterAll(async (done) => {
-        await store.disconnect();
+        await store.disconnect().catch((err) => { /* do nothing */ });
         done();
+    });
+
+    it("check client initialization before isReady", async (done) => {
+        try {
+            await store.isReady();
+        } catch (error) {
+            expect(error.message).toBe("Client is not initialized");
+        } finally {
+            done();
+        }
+
     });
 
     it("check client initialization before get", async (done) => {

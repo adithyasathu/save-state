@@ -1,3 +1,4 @@
+import { validate } from "./validator";
 import { EventEmitter } from "events";
 import { promisifyAll } from "bluebird";
 import { logger as log } from "./logger";
@@ -23,20 +24,27 @@ export class RedisStore extends EventEmitter implements IStore {
     }
 
     public isReady(): Promise<void> {
+        if (!this.client) {
+            throw new Error("Client is not initialized");
+        }
         this.emit(HealthEvents.Ready, this.client.connected);
         return Promise.resolve();
     }
 
     public async disconnect() {
-        if (this.client) {
-            this.client.end(true);
-            this.emit(HealthEvents.Ready, false);
+        if (!this.client) {
+            throw new Error("Client is not initialized");
         }
+        this.client.end(true);
+        this.emit(HealthEvents.Ready, false);
+
     }
 
     public async remove(key: string) {
         if (!this.client) {
             throw new Error("Client is not initialized");
+        } else if (!key) {
+            throw new Error("not a valid key");
         }
         return (this.client as any).delAsync(key);
     }
@@ -52,32 +60,32 @@ export class RedisStore extends EventEmitter implements IStore {
         if (!this.client) {
             throw new Error("Client is not initialized");
         }
-
+        if (!keys || keys.length === 0 || keys.includes("")) {
+            throw new Error("invalid keys");
+        }
         return (this.client as any).mgetAsync(keys).then((values: any) => {
             const mapping: any = {};
             // There should always be a one to one map
             for (let i = 0; i < keys.length; i++) {
-                const value = JSON.parse(values[i] || "{}");
+                const value = values[i] ? JSON.parse(values[i]) : null;
                 mapping[keys[i]] =  value;
             }
             return mapping;
         });
     }
 
-    public async set(map: any) {
+    public async set(mappings: any) {
         if (!this.client) {
             throw new Error("Client is not initialized");
         }
-
-        const writes = [];
-        const keys = Object.keys(map);
-        if (keys.length === 0) {
-            return;
+        if (!validate(mappings)) {
+            throw new Error("not a valid object to save");
         }
-
+        const keys = Object.keys(mappings);
+        const writes = [];
         for (const key of keys) {
             writes.push(key);
-            writes.push(JSON.stringify(map[key]));
+            writes.push(JSON.stringify(mappings[key]));
         }
         return (this.client as any).msetAsync(writes);
     }
