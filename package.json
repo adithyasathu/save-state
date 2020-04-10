@@ -1,6 +1,6 @@
 {
   "name": "save-state",
-  "version": "1.0.0-alpha-3",
+  "version": "1.0.1",
   "description": "Abstraction for data store with In-Memory cache, MongoDB, Redis and Elastic without worrying about the internal implementations",
   "main": "lib/index.js",
   "types": "lib",
