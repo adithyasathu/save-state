@@ -1,7 +1,7 @@
 {
   "name": "save-state",
-  "version": "1.0.1",
-  "description": "Abstraction for data store with In-Memory cache, MongoDB, Redis and Elastic without worrying about the internal implementations",
+  "version": "1.0.2",
+  "description": "Use your favourite data store like In-Memory cache, MongoDB, Redis and Elastic without worrying about the internal implementations",
   "main": "lib/index.js",
   "types": "lib",
   "scripts": {

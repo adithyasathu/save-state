@@ -1,6 +1,8 @@
 ### save-state
 
-Abstraction for data store with In-Memory cache, MongoDB, Redis and Elastic without worrying about the internal implementations
+Use your favourite data store like In-Memory cache, MongoDB, Redis and Elastic without worrying about the internal implementations.
+ 
+NPM https://www.npmjs.com/package/save-state
 
 
 [![Build Status](https://travis-ci.com/adithyasathu/save-state.svg?branch=master)](https://travis-ci.com/adithyasathu/save-state)
@@ -9,7 +11,7 @@ Abstraction for data store with In-Memory cache, MongoDB, Redis and Elastic with
 ## Installation
 
 ```bash
-npm install save-store
+npm install save-state
 ```
 
 ## Usage
@@ -17,7 +19,7 @@ npm install save-store
 #### Example
 
 ```js
-const Store = require("save-store");
+const Store = require("save-state");
 const client = Store.createClient();
 
 // register listener
@@ -144,7 +146,7 @@ client.remove("key-1");
 
 ```js
 
-// delete document
+// delete all documents
 client.removeAll();
 
 ```
